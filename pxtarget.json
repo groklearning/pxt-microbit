@@ -472,5 +472,12 @@
         "simGifMaxFrames": 44,
         "simScreenshotMaxUriLength": 300000,
         "importExtensionFiles": true
+    },
+    "queryVariants": {
+        "hidemenu": {
+            "appTheme": {
+                "hideMenuBar": true
+            }
+        }
     }
 }
