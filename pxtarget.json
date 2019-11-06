@@ -276,7 +276,7 @@
         "appLogo": "./static/icons/apple-touch-icon.png",
         "organization": "Grok Learning",
         "organizationUrl": "https://groklearning.com/",
-        "organizationLogo": "./static/logo-detail-white.svg",
+        "organizationLogo": "./static/logo-monkey-white.svg",
         "organizationWideLogo": "./static/logo-full-white.svg",
         "homeScreenHero": "./static/hero.png",
         "homeUrl": "https://groklearning.com/",
