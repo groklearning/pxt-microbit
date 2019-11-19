@@ -11,14 +11,14 @@ enum SensorType {
 };
 
 enum ColorEvent {
-    //% block=black
-    Black = 1,
     //% block=red
     R = 2,
     //% block=green
     G = 3,
     //% block=blue
     B = 4,
+    //% block=black
+    Black = 1,
     //% block=others
     Other = 5
 };
@@ -79,8 +79,8 @@ enum MotionTpye {
 /**
  * Extension blocks
  */
-//% weight=48 color=#0063A0 icon="\uf018" block="BitKit"
-//% groups="['Color Line Follower', 'Chassis']"
+//% weight=48 color=#4646DF icon="\uf018" block="Microcar"
+//% groups="['Colour Sensor', 'Line Follower', 'Car', 'Event Line Follower', 'others']"
 namespace BitKit {
 
     /**
@@ -88,47 +88,47 @@ namespace BitKit {
      * @param direction the direction that want to set.
      * @param speed the speed that want to run.
      */
-    //% blockId=motor_set_action block="Chassis go|%direction|at|%speed speed"
+    //% blockId=motor_set_action block="go|%direction|at|%speed speed"
     //% weight=100
-    //% group="Chassis"
+    //% group="Car"
     export function setMotormoduleAction(direction: DirectionTpye, speed: SpeedTpye) {
         let data: Buffer = pins.createBuffer(5);
         data[0] = 0x01;
-        if(direction == DirectionTpye.Forward){
+        if (direction == DirectionTpye.Forward) {
             data[1] = speed & 0xff;
             data[2] = (speed >> 8) & 0xff;
             data[3] = speed & 0xff;
-            data[4] = (speed >> 8) & 0xff;        
+            data[4] = (speed >> 8) & 0xff;
         }
-        else if(direction == DirectionTpye.Backward){
+        else if (direction == DirectionTpye.Backward) {
             data[1] = (-speed) & 0xff;
             data[2] = ((-speed) >> 8) & 0xff;
             data[3] = (-speed) & 0xff;
-            data[4] = ((-speed) >> 8) & 0xff;  
+            data[4] = ((-speed) >> 8) & 0xff;
         }
-        else if(direction == DirectionTpye.Left){
+        else if (direction == DirectionTpye.Left) {
             data[1] = 0 & 0xff;
             data[2] = (0 >> 8) & 0xff;
             data[3] = speed & 0xff;
-            data[4] = (speed >> 8) & 0xff;  
+            data[4] = (speed >> 8) & 0xff;
         }
-        else if(direction == DirectionTpye.Right){
+        else if (direction == DirectionTpye.Right) {
             data[1] = speed & 0xff;
             data[2] = (speed >> 8) & 0xff;
             data[3] = 0 & 0xff;
-            data[4] = (0 >> 8) & 0xff;        
+            data[4] = (0 >> 8) & 0xff;
         }
-        else if(direction == DirectionTpye.Clockwise){
+        else if (direction == DirectionTpye.Clockwise) {
             data[1] = speed & 0xff;
             data[2] = (speed >> 8) & 0xff;
             data[3] = (-speed) & 0xff;
-            data[4] = ((-speed) >> 8) & 0xff;        
+            data[4] = ((-speed) >> 8) & 0xff;
         }
-        else if(direction == DirectionTpye.Anticlockwise){
+        else if (direction == DirectionTpye.Anticlockwise) {
             data[1] = (-speed) & 0xff;
             data[2] = ((-speed) >> 8) & 0xff;
             data[3] = speed & 0xff;
-            data[4] = (speed >> 8) & 0xff;        
+            data[4] = (speed >> 8) & 0xff;
         }
         driver.i2cSendBytes(MotorTpye.Wheel, data);
     }
@@ -136,9 +136,9 @@ namespace BitKit {
     /**
      * Stop the motormodule.
      */
-    //% blockId=motor_stop_run block="Chassis stop"
+    //% blockId=motor_stop_run block="stop"
     //% weight=99
-    //% group="Chassis"
+    //% group="Car"
     export function stopMotormodule() {
         setMotormoduleSpeed(0, 0);
     }
@@ -148,11 +148,11 @@ namespace BitKit {
      * @param left the left speed you want to run.
      * @param right the right speed you want to run.
      */
-    //% blockId=motor_set_speed_with_duty block="Chassis left motor|%left|, right motor |%right"
+    //% blockId=motor_set_speed_with_duty block="left motor|%left|, right motor |%right"
     //% left.min=-255 left.max=255 left.defl=0
     //% right.min=-255 right.max=255 right.defl=0
     //% weight=98
-    //% group="Chassis"
+    //% group="Car"
     export function setMotormoduleSpeed(left: number, right: number) {
         let data: Buffer = pins.createBuffer(5);
         data[0] = 0x01;
@@ -175,7 +175,7 @@ namespace BitKit {
      */
     //% blockId=sensor_liner_create_event block="on Color Line Follower line position|%event"
     //% weight=100 
-    //% group="Color Line Follower"
+    //% advanced=true
     export function onLinePosition(event: LinerEvent, handler: () => void) {
         control.onEvent(eventIdLiner, event, handler);
         if (!initLiner) {
@@ -202,7 +202,7 @@ namespace BitKit {
      */
     //% blockId=sensor_color_create_event block="on Color Line Follower see |%event"
     //% weight=99
-    //% group="Color Line Follower"
+    //% advanced=true
     export function onColor(event: ColorEvent, handler: () => void) {
         const eventId = driver.subscribeToEventSource(SensorType.Liner);
         control.onEvent(eventId, event, handler);
@@ -212,9 +212,9 @@ namespace BitKit {
      * See if the line follower recognized the position of the line underneath.
      * @param event of liner device
      */
-    //% blockId=sensor_is_liner_event_generate block="Color Line Follower see line at|%event|"
+    //% blockId=sensor_is_liner_event_generate block="see line at|%event|"
     //% weight=98
-    //% group="Color Line Follower"
+    //% group="Line Follower"
     export function wasLinePositionTriggered(event: LinerEvent): boolean {
         let eventValue = event;
         if (!initLiner) onLinePosition(event, () => { });
@@ -226,9 +226,9 @@ namespace BitKit {
      * See if the color sensor detected a specific color.
      * @param event of color device
      */
-    //% blockId=sensor_is_color_event_generate block="Color Line Follower see color|%event|"
+    //% blockId=sensor_is_color_event_generate block="see color|%event|"
     //% weight=97
-    //% group="Color Line Follower"
+    //% group="Colour Sensor"
     export function wasColorTriggered(event: ColorEvent): boolean {
         let eventValue = event;
         if (driver.addrBuffer[SensorType.Liner] == 0) onColor(event, () => { });
@@ -241,11 +241,30 @@ namespace BitKit {
      */
     //% blockId=sensor_get_color_rgb block="Color Line Follower color value"
     //% weight=96
-    //% group="Color Line Follower"
+    //% advanced=true
     export function getColor(): number {
         let data: Buffer = pins.createBuffer(4);
         driver.i2cSendByte(SensorType.Liner, 0x04);
         data = driver.i2cReceiveBytes(SensorType.Liner, 4);
         return (data[0] + data[1] * 256 + data[2] * 65536);
+    }
+
+    /**
+     * See if colour sensor detected a specific custom colour
+     *
+     */
+    //%blockId=i2c block="see white"
+    //% group="Colour Sensor"
+    export function seeWhite(): boolean {
+        //separate colour channels
+        let col = getColor()
+        let red = col >>> 16
+        let green = col & 0b1111111100000000
+        let blue = col & 0b11111111
+
+        if (col > 16759431) { //almost white, TODO: separate out RGB channels for accuracy/rewrite getColor
+            return true;
+        }
+        return false;
     }
 }
