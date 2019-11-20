@@ -12,7 +12,7 @@
         "libs/bluetooth",
         "libs/servo",
         "libs/radio-broadcast",
-        "libs/pxt-grove-zero-for-microbit"
+        "libs/aca-microcar-blocks"
     ],
     "cloud": {
         "workspace": false,

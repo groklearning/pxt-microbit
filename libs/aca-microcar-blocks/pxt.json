@@ -3,7 +3,7 @@
     "version": "0.0.2",
     "description": "An ACA extension for the Resources Challenge: Automation",
     "dependencies": {
-        "core": "*",
+        "core": "file:../core",
         "ws2018b": "github:Microsoft/pxt-ws2812b#v0.0.4"
     },
     "files": [
