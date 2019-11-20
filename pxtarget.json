@@ -15,15 +15,13 @@
     ],
     "cloud": {
         "workspace": false,
-        "packages": false,
+        "packages": true,
         "sharing": false,
         "thumbnails": false,
         "publishing": false,
         "importing": false,
-        "preferredPackages": [
-            "Microsoft/pxt-neopixel"
-        ],
-        "githubPackages": false
+        "preferredPackages": ["computingacademy/aca-microcar-blocks"],
+        "githubPackages": true
     },
     "compile": {
         "isNative": false,
@@ -277,7 +275,7 @@
         "appLogo": "./static/icons/apple-touch-icon.png",
         "organization": "Grok Learning",
         "organizationUrl": "https://groklearning.com/",
-        "organizationLogo": "./static/logo-detail-white.svg",
+        "organizationLogo": "./static/logo-monkey-white.svg",
         "organizationWideLogo": "./static/logo-full-white.svg",
         "homeScreenHero": "./static/hero.png",
         "homeUrl": "https://groklearning.com/",
@@ -304,7 +302,8 @@
             "bluetoothPartialFlashing",
             "simScreenshot",
             "simGif",
-            "qrCode"
+            "qrCode",
+            "githubBlocksDiff"
         ],
         "bluetoothUartFilters": [
             {
@@ -466,10 +465,18 @@
             "0": "v0"
         },
         "python": true,
+        "showProjectSettings": true,
         "scriptManager": true,
         "simGifTransparent": "rgba(0,0,0,0)",
         "simGifMaxFrames": 44,
         "simScreenshotMaxUriLength": 300000,
         "importExtensionFiles": true
+    },
+    "queryVariants": {
+        "hidemenu": {
+            "appTheme": {
+                "hideMenuBar": true
+            }
+        }
     }
 }

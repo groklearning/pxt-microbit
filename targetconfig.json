@@ -1,6 +1,7 @@
 {
     "packages": {
         "approvedRepos": [
+	    "computingacademy/aca-microcar-blocks",
             "Microsoft/pxt-neopixel",
             "Microsoft/pxt-microturtle",
             "Microsoft/pxt-sonar",
@@ -50,6 +51,7 @@
             "sparkfun/pxt-gamer-bit",
             "sparkfun/pxt-moto-bit",
             "sparkfun/pxt-weather-bit",
+            "sparkfun/pxt-gator-environment",
             "minodekit/pxt-minode",
             "LaboratoryForPlayfulComputation/pxt-BlockyTalkyBLE",
             "mbitfun/pxt-katakana",
@@ -135,19 +137,23 @@
             "plenprojectcompany/pxt-PLENbit",
             "4tronix/MiniBit",
             "elecfreaks/pxt-wukong",
-            "rebeccaclavier/pxt-bmp280"
+            "sparkfun/pxt-gator-particle",
+            "sparkfun/pxt-gator-soil",
+            "sparkfun/pxt-gator-microphone",
+            "rebeccaclavier/pxt-bmp280",
+            "xinabox/pxt-SW01",
+            "xinabox/pxt-OD01",
+            "51bit/dfplayermini",
+            "makecode-extensions/STTS751",
+            "makecode-extensions/LSM6DSO",
+            "makecode-extensions/LPS22",
+            "makecode-extensions/LIS2DW12",
+            "makecode-extensions/LIS2MDL",
+            "makecode-extensions/HTS221",
+            "assirati/pxt-inventura",
+            "Veilkrand/pxt-RobotCar"
         ],
-        "preferredRepos": [
-            "Microsoft/pxt-neopixel",
-            "Microsoft/pxt-microturtle",
-            "Tinkertanker/pxt-tinkercademy-tinker-kit",
-            "kittenbot/pxt-robotbit",
-            "Microsoft/pxt-sonar",
-            "4tronix/BitBot",
-            "kitronikltd/pxt-kitronik-servo-lite",
-            "kitronikltd/pxt-kitronik-motor-driver",
-            "Tinkertanker/pxt-ringbitcar"
-        ]
+        "preferredRepos": []
     },
     "languages": [
         "en",
@@ -188,7 +194,8 @@
         "Turtle": "projects/turtle",
         "Blocks To JavaScript": "courses/blocks-to-javascript",
         "Courses": "courses",
-        "Behind the MakeCode Hardware": "behind-the-makecode-hardware"
+        "Behind the MakeCode Hardware": "behind-the-makecode-hardware",
+        "Coding Cards": "coding-cards"
     },
     "electronManifest": {
         "latest": "v2.0.3"
