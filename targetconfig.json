@@ -1,6 +1,7 @@
 {
     "packages": {
         "approvedRepos": [
+	    "computingacademy/aca-microcar-blocks",
             "Microsoft/pxt-neopixel",
             "Microsoft/pxt-microturtle",
             "Microsoft/pxt-sonar",

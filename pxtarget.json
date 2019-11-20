@@ -11,8 +11,7 @@
         "libs/devices",
         "libs/bluetooth",
         "libs/servo",
-        "libs/radio-broadcast",
-        "libs/aca-microcar-blocks"
+        "libs/radio-broadcast"
     ],
     "cloud": {
         "workspace": false,
@@ -21,8 +20,8 @@
         "thumbnails": false,
         "publishing": false,
         "importing": false,
-        "preferredPackages": [],
-        "githubPackages": false
+        "preferredPackages": ["computingacademy/aca-microcar-blocks"],
+        "githubPackages": true
     },
     "compile": {
         "isNative": false,
