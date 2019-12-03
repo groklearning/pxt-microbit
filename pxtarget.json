@@ -22,7 +22,7 @@
         "publishing": false,
         "importing": false,
         "preferredPackages": [],
-        "githubPackages": false
+        "githubPackages": true
     },
     "compile": {
         "isNative": false,
