@@ -1,0 +1,80 @@
+CACHE MANIFEST
+
+CACHE:
+/pxt-microbit/semantic.js
+/pxt-microbit/main.js
+/pxt-microbit/pxtapp.js
+/pxt-microbit/typescript.js
+/pxt-microbit/marked/marked.min.js
+/pxt-microbit/highlight.js/highlight.pack.js
+/pxt-microbit/jquery.js
+/pxt-microbit/pxtlib.js
+/pxt-microbit/pxtcompiler.js
+/pxt-microbit/pxtpy.js
+/pxt-microbit/pxtblockly.js
+/pxt-microbit/pxtwinrt.js
+/pxt-microbit/pxteditor.js
+/pxt-microbit/pxtsim.js
+/pxt-microbit/pxtembed.js
+/pxt-microbit/pxtworker.js
+/pxt-microbit/pxtweb.js
+/pxt-microbit/blockly.css
+/pxt-microbit/semantic.css
+/pxt-microbit/rtlsemantic.css
+
+
+/pxt-microbit/editor.js
+/pxt-microbit/fieldeditors.js
+
+# blockly
+/pxt-microbit/blockly/media/sprites.png
+/pxt-microbit/blockly/media/click.mp3
+/pxt-microbit/blockly/media/disconnect.wav
+/pxt-microbit/blockly/media/delete.mp3
+
+# monaco; keep in sync with webapp/public/index.html
+/pxt-microbit/vs/loader.js
+/pxt-microbit/vs/base/worker/workerMain.js
+/pxt-microbit/vs/basic-languages/src/bat.js
+/pxt-microbit/vs/basic-languages/src/cpp.js
+/pxt-microbit/vs/basic-languages/src/python.js
+/pxt-microbit/vs/basic-languages/src/markdown.js
+/pxt-microbit/vs/editor/editor.main.css
+/pxt-microbit/vs/editor/editor.main.js
+/pxt-microbit/vs/editor/editor.main.nls.js
+/pxt-microbit/vs/language/json/jsonMode.js
+/pxt-microbit/vs/language/json/jsonWorker.js
+/pxt-microbit/vs/language/typescript/lib/typescriptServices.js
+/pxt-microbit/vs/language/typescript/src/mode.js
+/pxt-microbit/vs/language/typescript/src/worker.js
+
+# charts
+/pxt-microbit/smoothie/smoothie_compressed.js
+/pxt-microbit/images/Bars_black.gif
+
+# gifjs
+/pxt-microbit/gifjs/gif.js
+
+# ai
+/pxt-microbit/ai.0.js
+
+/pxt-microbit/worker.js
+/pxt-microbit/monacoworker.js
+
+# ver Fri Dec 06 2019 12:32:43 GMT+1100 (Australian Eastern Daylight Time)
+
+# target
+/pxt-microbit/docs/static/logo.portrait.white.svg
+/pxt-microbit/docs/static/logo.square.white.svg
+/pxt-microbit/docs/static/logo.square.white.svg
+/pxt-microbit/docs/static/logo.portrait.black.svg
+/pxt-microbit/docs/static/icons/apple-touch-icon.png
+/pxt-microbit/docs/static/icons/apple-touch-icon.png
+/pxt-microbit/docs/static/logo-monkey-white.svg
+/pxt-microbit/docs/static/logo-full-white.svg
+/pxt-microbit/docs/static/hero.png
+
+/pxt-microbit/target.js
+  
+NETWORK:
+*
