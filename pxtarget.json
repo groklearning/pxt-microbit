@@ -11,8 +11,7 @@
         "libs/devices",
         "libs/bluetooth",
         "libs/servo",
-        "libs/radio-broadcast",
-        "libs/pxt-grove-zero-for-microbit"
+        "libs/radio-broadcast"
     ],
     "cloud": {
         "workspace": false,
@@ -22,7 +21,7 @@
         "publishing": false,
         "importing": false,
         "preferredPackages": [],
-        "githubPackages": true
+        "githubPackages": false
     },
     "compile": {
         "isNative": false,

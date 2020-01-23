@@ -1,3 +1,18 @@
+# Grok micro:bit fork
+
+G'day welcome to our fork of microsoft/pxt-microbit.
+
+We use this to statically package up pxt-microbit for use inside a course. We use this, rather than the official microbit.makecode.org so that we avoid being dependent on a moving target, and so we can control privacy, cookies etc. We want a static version so we only need to serve static assets. 
+
+Mostly, this is pretty much the same as the official ones, so not much to see here.
+
+The main big change is that without the official service, we are missing APIs for adding packages from github and compiling packages. To solve this we do the following:
+
+1. For an author to add a package, they must first build it on their machine, and then import it using MakeCode by selecting "Upload a package". This way the package is stored in the workspace.
+
+2. Any new libraries need to be pre-built and added to our folder of built packages. This folder is `built_packages` and must be manually updated. It is copied into the `built/packaged/hexcache` directory to be statically served.
+
+
 # micro:bit target for PXT
 
 [![Build Status](https://travis-ci.org/microsoft/pxt-microbit.svg?branch=master)](https://travis-ci.org/microsoft/pxt-microbit)

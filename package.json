@@ -11,6 +11,12 @@
     "type": "git",
     "url": "git+https://github.com/Microsoft/pxt-microbit.git"
   },
+  "scripts": {
+    "start": "npm run build && npm run serve",
+    "serve": "cd built/packaged && python3 -m http.server 3232",
+    "build": "pxt staticpkg && npm run copy-static",
+    "copy-static": "cp built_hexfiles/* built/packaged/hexcache/ && cp -R docs/* built/packaged/$DEPLOY_HASH/"
+  },
   "author": "",
   "license": "MIT",
   "homepage": "https://github.com/Microsoft/pxt-microbit#readme",
