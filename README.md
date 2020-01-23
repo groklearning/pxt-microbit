@@ -10,7 +10,9 @@ The main big change is that without the official service, we are missing APIs fo
 
 1. For an author to add a package, they must first build it on their machine, and then import it using MakeCode by selecting "Upload a package". This way the package is stored in the workspace.
 
-2. Any new libraries need to be pre-built and added to our folder of built packages. This folder is `built_packages` and must be manually updated. It is copied into the `built/packaged/hexcache` directory to be statically served.
+2. Any new libraries need to be pre-built and added to our folder of built packages. This folder is `built_hexfiles` and must be manually updated. It is copied into the `built/packaged/hexcache` directory to be statically served.
+
+3. To obtain a built hexfile load up makecode locally on your machine, load in a workspace that is dependent on the package you want to build, then click the download hex button. MakeCode will make a request to the microsoft API and grab the file. Use the inspector to obtain this file and save it into the `built_hexfiles` directory.
 
 
 # micro:bit target for PXT
