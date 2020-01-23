@@ -2,11 +2,21 @@
 
 G'day welcome to our fork of microsoft/pxt-microbit.
 
-We use this to statically package up pxt-microbit for use inside a course. We use this, rather than the official microbit.makecode.org so that we avoid being dependent on a moving target, and so we can control privacy, cookies etc. We want a static version so we only need to serve static assets. 
+Mostly, this is pretty much the same as the official one, so not much to see here.
 
-Mostly, this is pretty much the same as the official ones, so not much to see here.
+We use this to statically package up pxt-microbit for use inside a course. We use this, rather than the official microbit.makecode.org so that we avoid being dependent on a moving target, and so we can control privacy, cookies etc. We want a static version so we only need to serve static assets.
 
-The main big change is that without the official service, we are missing APIs for adding packages from github and compiling packages. To solve this we do the following:
+To run locally use:
+
+```
+npm run start
+```
+
+Then you can access MakeCode at `localhost:3232/local/index.html`. `local` is there to match the use of a deploy path on prod.
+
+This task needs to be run each time you make a change. Which is slow, but is necessary so that we emulate prod.
+
+The main big difference between our version and the official service is that we are missing APIs for adding packages from github and compiling packages. To solve this we do the following:
 
 1. For an author to add a package, they must first build it on their machine, and then import it using MakeCode by selecting "Upload a package". This way the package is stored in the workspace.
 
