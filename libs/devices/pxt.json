@@ -8,7 +8,7 @@
         "devices.cpp",
         "devices.ts"
     ],
-    "icon": "./docs/static/packages/devices/icon.png",
+    "icon": "./static/packages/devices/icon.png",
     "public": true,
     "dependencies": {
         "core": "file:../core",
