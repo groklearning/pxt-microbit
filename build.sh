@@ -1,6 +1,9 @@
+#!/bin/bash
+set -ue -o pipefail -o errtrace
+
 DEPLOY_PATH=${DEPLOY_HASH:-local}
 
-pxt staticpkg -r "$DEPLOY_PATH"
+node node_modules/pxt-core/built/pxt.js staticpkg -r "$DEPLOY_PATH"
 cp built_hexfiles/* built/packaged/$DEPLOY_PATH/hexcache/
 cd built/packaged/$DEPLOY_PATH/
 ln -s docs/static
