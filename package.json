@@ -11,6 +11,11 @@
     "type": "git",
     "url": "git+https://github.com/Microsoft/pxt-microbit.git"
   },
+  "scripts": {
+    "start": "npm run build && npm run serve",
+    "serve": "cd built/packaged/ && python3 -m http.server 3232",
+    "build": "./build.sh"
+  },
   "author": "",
   "license": "MIT",
   "homepage": "https://github.com/Microsoft/pxt-microbit#readme",
