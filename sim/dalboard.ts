@@ -18,10 +18,15 @@ namespace pxsim {
         microphoneState: AnalogSensorState;
         lightState: pxt.Map<CommonNeoPixelState>;
         fileSystem: FileSystemState;
+        logoTouch: Button;
+        speakerEnabled: boolean = true;
 
         // visual
         viewHost: visuals.BoardHost;
         view: SVGElement;
+
+        // board hardware version
+        hardwareVersion = 1;
 
         constructor() {
             super()
@@ -86,13 +91,14 @@ namespace pxsim {
                 ID_RADIO: DAL.MICROBIT_ID_RADIO,
                 RADIO_EVT_DATAGRAM: DAL.MICROBIT_RADIO_EVT_DATAGRAM
             });
-            this.builtinParts["microphone"] = this.microphoneState = new AnalogSensorState(3001 /* DEVICE_ID_MICROPHONE */, 52, 120, 75, 96);
+            this.builtinParts["microphone"] = this.microphoneState = new AnalogSensorState(DAL.DEVICE_ID_MICROPHONE, 0, 255, 86, 165);
             this.builtinParts["accelerometer"] = this.accelerometerState = new AccelerometerState(runtime);
             this.builtinParts["serial"] = this.serialState = new SerialState();
             this.builtinParts["thermometer"] = this.thermometerState = new ThermometerState();
             this.builtinParts["lightsensor"] = this.lightSensorState = new LightSensorState();
             this.builtinParts["compass"] = this.compassState = new CompassState();
             this.builtinParts["microservo"] = this.edgeConnectorState;
+            this.builtinParts["logotouch"] = this.logoTouch = new Button(DAL.MICROBIT_ID_LOGO);
 
             this.builtinVisuals["buttonpair"] = () => new visuals.ButtonPairView();
             this.builtinVisuals["ledmatrix"] = () => new visuals.LedMatrixView();
@@ -105,6 +111,13 @@ namespace pxsim {
             this.builtinPartVisuals["buttonpair"] = (xy: visuals.Coord) => visuals.mkBtnSvg(xy);
             this.builtinPartVisuals["ledmatrix"] = (xy: visuals.Coord) => visuals.mkLedMatrixSvg(xy, 8, 8);
             this.builtinPartVisuals["microservo"] = (xy: visuals.Coord) => visuals.mkMicroServoPart(xy);
+        }
+
+        ensureHardwareVersion(version: number) {
+            if (version > this.hardwareVersion) {
+                this.hardwareVersion = version;
+                this.updateView();
+            }
         }
 
         receiveMessage(msg: SimulatorMessage) {
@@ -134,6 +147,16 @@ namespace pxsim {
             const cmpDefs = msg.partDefinitions || {};
             const fnArgs = msg.fnArgs;
 
+            const v2Parts: pxt.Map<boolean> = { "microphone": true, "logotouch": true, "builtinspeaker": true };
+            if (msg.builtinParts) {
+                const v2PartsUsed = msg.builtinParts.filter(k => v2Parts[k])
+                if (v2PartsUsed.length) {
+                    console.log(`detected v2 feature`, v2PartsUsed);
+                    cmpsList.push(...v2PartsUsed);
+                    this.hardwareVersion = 2;
+                }
+            }
+
             const opts: visuals.BoardHostOpts = {
                 state: this,
                 boardDef: boardDef,
@@ -144,6 +167,7 @@ namespace pxsim {
                 maxHeight: "100%",
                 highContrast: msg.highContrast
             };
+
             this.viewHost = new visuals.BoardHost(pxsim.visuals.mkBoardView({
                 visual: boardDef.visual,
                 boardDef: boardDef,

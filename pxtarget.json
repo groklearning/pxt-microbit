@@ -37,6 +37,7 @@
         "gc": true,
         "imageRefTag": 9,
         "shimRenames": {
+            "sendBufferAsm": "light::sendWS2812Buffer"
         },
         "patches": {
             "0.0.0 - 1.0.0": [
@@ -94,6 +95,22 @@
                         "DisplayMode\\s*\\.\\s*BackAndWhite": "DisplayMode.BlackAndWhite"
                     }
                 }
+            ],
+            "0.0.0 - 3.1.10": [
+                {
+                    "type": "package",
+                    "map": {
+                        "pxt-microbit-v2-extension": "microphone"
+                    }
+                }
+            ],
+            "0.0.0 - 3.0.18": [
+                {
+                    "type": "missingPackage",
+                    "map": {
+                        ".*": "microphone"
+                    }
+                }
             ]
         },
         "hidSelectors": [
@@ -111,7 +128,7 @@
         "yottaTarget": "bbc-microbit-classic-gcc",
         "yottaCorePackage": "microbit",
         "githubCorePackage": "lancaster-university/microbit",
-        "gittag": "v2.2.0-rc5",
+        "gittag": "v2.2.0-rc6",
         "serviceId": "microbit",
         "dockerImage": "pext/yotta:latest"
     },
@@ -119,6 +136,7 @@
         "mbdal",
         "mbcodal"
     ],
+    "alwaysMultiVariant" : true,
     "variants": {
         "mbdal": {
             "compile": {},
@@ -127,20 +145,21 @@
         "mbcodal": {
             "compile": {
                 "flashUsableEnd": null,
-                "flashEnd": null
+                "flashEnd": null,
+                "flashCodeAlign": 4096
             },
             "compileService": {
                 "buildEngine": "codal",
                 "codalTarget": {
-                    "name": "codal-microbit",
-                    "url": "https://github.com/microbit-foundation/codal-microbit",
-                    "branch": "v0.1.1",
+                    "name": "codal-microbit-v2",
+                    "url": "https://github.com/lancaster-university/codal-microbit-v2",
+                    "branch": "v0.2.24",
                     "type": "git"
                 },
                 "codalBinary": "MICROBIT",
-                "githubCorePackage": "microbit-foundation/codal",
-                "gittag": "pxt-wip-build-v0.0.1",
-                "serviceId": "mbcodal",
+                "githubCorePackage": "lancaster-university/microbit-v2-samples",
+                "gittag": "v0.2.11",
+                "serviceId": "mbcodal2",
                 "dockerImage": "pext/yotta:latest",
                 "yottaConfigCompatibility": true
             }
@@ -266,7 +285,11 @@
                 "speaker",
                 "bluetooth",
                 "thermometer",
-                "compass"
+                "compass",
+
+                "builtinspeaker",
+                "microphone",
+                "logotouch"
             ],
             "pinStyles": {
                 "P0": "croc",
@@ -469,6 +492,7 @@
         "availableLocales": [
             "en",
             "ar",
+            "bg",
             "cs",
             "da",
             "de",
@@ -476,6 +500,7 @@
             "es-ES",
             "fi",
             "fr",
+            "he",
             "hu",
             "is",
             "it",
@@ -501,7 +526,8 @@
         },
         "browserDbPrefixes": {
             "1": "v1",
-            "2": "v2"
+            "2": "v2",
+            "3": "v3"
         },
         "editorVersionPaths": {
             "0": "v0"
@@ -526,6 +552,14 @@
         "hidemenu": {
             "appTheme": {
                 "hideMenuBar": true
+            }
+        },
+        "androidapp": {
+            "compile": {
+                "webUSB": false
+            },
+            "appTheme": {
+                "disableBlobObjectDownload": true
             }
         }
     },

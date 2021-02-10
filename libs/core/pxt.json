@@ -39,6 +39,7 @@
         "game.ts",
         "led.cpp",
         "led.ts",
+        "music.cpp",
         "music.ts",
         "melodies.ts",
         "pins.cpp",
@@ -47,13 +48,21 @@
         "serial.ts",
         "buffer.cpp",
         "buffer.ts",
+        "json.ts",
+        "poll.ts",
         "pxtparts.json",
         "advmath.cpp",
         "trig.cpp",
         "fixed.ts",
         "templates.ts",
         "sendbuffer.s",
+        "sendbuffernrf52.s",
+        "sendbufferbrightness.s",
         "light.cpp",
+        "logo.cpp",
+        "touchmode.cpp",
+        "soundexpressions.ts",
+        "soundexpressions.cpp",
         "parts/speaker.svg",
         "parts/headphone.svg"
     ],
@@ -64,9 +73,9 @@
         "compileServiceVariant": "mbcodal",
         "includeDirs": [
             "libraries/codal-core/inc",
-            "libraries/codal-microbit/inc",
-            "libraries/codal-microbit/model",
-            "libraries/codal-microbit/inc/compat",
+            "libraries/codal-microbit-v2/inc",
+            "libraries/codal-microbit-v2/model",
+            "libraries/codal-microbit-v2/inc/compat",
             "pxtapp"
         ],
         "excludePrefix": [
@@ -88,7 +97,8 @@
     "yotta": {
         "config": {
             "microbit-dal": {
-                "fiber_user_data": 1
+                "fiber_user_data": 1,
+                "pxt": 1
             }
         },
         "optionalConfig": {

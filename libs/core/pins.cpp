@@ -1,5 +1,12 @@
 #include "pxt.h"
 
+#if MICROBIT_CODAL
+#include "Pin.h"
+#define PinCompat codal::Pin
+#else
+#define PinCompat MicroBitPin
+#endif
+
 enum class DigitalPin {
     P0 = MICROBIT_ID_IO_P0,
     P1 = MICROBIT_ID_IO_P1,
@@ -247,6 +254,17 @@ namespace pins {
         MicroBitPin* pin = getPin((int)name);
         if (!pin) return 0;
 
+#if MICROBIT_CODAL
+        // set polarity
+        pin->setPolarity(PulseValue::High == value ? 1 : 0);
+        // record pulse
+        int period = pin->getPulseUs(maxDuration);
+        // timeout
+        if (DEVICE_CANCELLED == period)
+            return 0;
+        // success!
+        return period;
+#else
         int pulse = value == PulseValue::High ? 1 : 0;
         uint64_t tick =  system_timer_current_time_us();
         uint64_t maxd = (uint64_t)maxDuration;
@@ -262,6 +280,7 @@ namespace pins {
         }
         uint64_t end =  system_timer_current_time_us();
         return end - start;
+#endif
     }
 
     /**
@@ -301,9 +320,9 @@ namespace pins {
     }
 
 
-    MicroBitPin* pitchPin = NULL;
-    MicroBitPin* pitchPin2 = NULL;
+    PinCompat* pitchPin = NULL;
     uint8_t pitchVolume = 0xff;
+    bool analogTonePlaying = false;
 
     /**
      * Set the pin used when using analog pitch or music.
@@ -315,10 +334,9 @@ namespace pins {
     //% name.fieldOptions.tooltips="false" name.fieldOptions.width="250"
     void analogSetPitchPin(AnalogPin name) {
         pitchPin = getPin((int)name);
-        pitchPin2 = NULL;
     }
 
-    void pinAnalogSetPitch(MicroBitPin* pin, int frequency, int ms) {
+    void pinAnalogSetPitch(PinCompat* pin, int frequency, int ms) {
       if (frequency <= 0 || pitchVolume == 0) {
         pin->setAnalogValue(0);
       } else {
@@ -335,8 +353,15 @@ namespace pins {
     //% blockId=device_analog_set_pitch_volume block="analog set pitch volume $volume"
     //% help=pins/analog-set-pitch-volume weight=3 advanced=true
     //% volume.min=0 volume.max=255
+    //% deprecated
     void analogSetPitchVolume(int volume) {
         pitchVolume = max(0, min(0xff, volume));
+
+        if (analogTonePlaying) {
+            int v = pitchVolume == 0 ? 0 : 1 << (pitchVolume >> 5);
+            if (NULL != pitchPin)
+                pitchPin->setAnalogValue(v);
+        }
     }
 
     /**
@@ -344,6 +369,7 @@ namespace pins {
     */
     //% blockId=device_analog_pitch_volume block="analog pitch volume"
     //% help=pins/analog-pitch-volume weight=3 advanced=true
+    //% deprecated
     int analogPitchVolume() {
         return pitchVolume;
     }
@@ -358,24 +384,24 @@ namespace pins {
     void analogPitch(int frequency, int ms) {
         // init pins if needed
         if (NULL == pitchPin) {
+#if MICROBIT_CODAL
+            pitchPin = &uBit.audio.virtualOutputPin;
+#else
             pitchPin = getPin((int)AnalogPin::P0);
-#ifdef SOUND_MIRROR_EXTENSION
-            pitchPin2 = &SOUND_MIRROR_EXTENSION;
-#endif           
+#endif            
         }
         // set pitch
+        analogTonePlaying = true;
         if (NULL != pitchPin)
             pinAnalogSetPitch(pitchPin, frequency, ms);
-        if (NULL != pitchPin2)
-            pinAnalogSetPitch(pitchPin2, frequency, ms);
         // clear pitch
         if (ms > 0) {
             fiber_sleep(ms);
             if (NULL != pitchPin)
                 pitchPin->setAnalogValue(0);
-            if (NULL != pitchPin2)
-                pitchPin2->setAnalogValue(0);
-            fiber_sleep(5);
+            analogTonePlaying = false;
+            // causes issues with v2 DMA.
+            // fiber_sleep(5);
         }
     }
 
@@ -390,7 +416,7 @@ namespace pins {
     //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
     //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
     void setPull(DigitalPin name, PinPullMode pull) {
-#if MICROBIT_CODAL        
+#if MICROBIT_CODAL
         codal::PullMode m = pull == PinPullMode::PullDown
             ? codal::PullMode::Down
             : pull == PinPullMode::PullUp ? codal::PullMode::Up
@@ -517,7 +543,7 @@ namespace pins {
     //% blockId=spi_format block="spi format|bits %bits|mode %mode"
     void spiFormat(int bits, int mode) {
         auto p = allocSPI();
-        p->format(bits, mode);        
+        p->format(bits, mode);
     }
 
 #if MICROBIT_CODAL
@@ -551,10 +577,25 @@ namespace pins {
     */
     //% help=pins/push-button advanced=true
     void pushButton(DigitalPin pin) {
+        new MicroBitButton((PinName)getPin((int)(pin))->name, (int)pin, MICROBIT_BUTTON_ALL_EVENTS, PinMode::PullUp);
+    }
+
+    /**
+    * Set the pin used when producing sounds and melodies. Default is P0.
+    * @param name pin to modulate pitch from
+    */
+    //% blockId=pin_set_audio_pin block="set audio pin $name"
+    //% help=pins/set-audio-pin weight=3
+    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=4
+    //% name.fieldOptions.tooltips="false" name.fieldOptions.width="250"
+    //% weight=1
+    void setAudioPin(AnalogPin name) {
 #if MICROBIT_CODAL
-        new MicroBitButton(PIN_ARG(pin), (int)pin, DEVICE_BUTTON_ALL_EVENTS, ACTIVE_LOW, codal::PullMode::Up);
+        uBit.audio.setPin(*getPin((int)name));
+        uBit.audio.setPinEnabled(true);
 #else
-        new MicroBitButton(PIN_ARG(pin), PinMode::PullUp);
+        // v1 behavior
+        pins::analogSetPitchPin(name);
 #endif
     }
 }

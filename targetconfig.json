@@ -47,6 +47,7 @@
             "Tinkertanker/pxt-ringbitcar",
             "Tinkertanker/uDriver_PCA9585",
             "Tinkertanker/pxt-alphanumeric-ht16k33",
+            "Tinkertanker/pxt-stepper-motor",
             "CoderDojoOlney/pxt-olney",
             "PaulDFoster/pxt-microbit-GY521",
             "chevyng/pxt-ucl-junkrobot",
@@ -173,8 +174,15 @@
             "MakeAndLearn/pxt-microshield",
             "4tronix/Orbit",
             "elecfreaks/pxt-TPBot",
+            "longan-link/pxt-longanbit",
             "CODOmicrobit/pxt-CODO",
-            "KitronikLtd/pxt-kitronik-move-motor"
+            "KitronikLtd/pxt-kitronik-move-motor",
+            "elecfreaks/pxt-PlanetX",
+            "elecfreaks/pxt-nezha",
+            "philipphenkel/pxt-powerfunctions",
+            "1010Technologies/pxt-makerbit-ir-transmitter",
+            "DFRobot/pxt-DFRobot_HuskyLens",
+            "bsiever/microbit-pxt-timeanddate"
         ],
         "preferredRepos": []
     },
@@ -194,7 +202,7 @@
         "Behind the MakeCode Hardware": "behind-the-makecode-hardware",
         "Science Experiments": "science-experiments",
         "Coding Cards": "coding-cards",
-        "Beta Deep Dive": "beta-deep-dive"
+        "Deep Dive": "deep-dive"
     },
     "electronManifest": {
         "latest": "v2.0.3"
