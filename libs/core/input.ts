@@ -25,6 +25,7 @@ namespace input {
      * Attaches code to run when the device is shaken.
      * @param body TODO
      */
+    //% deprecated=true
     //% help=input/on-shake
     export function onShake(body: () => void): void {
         onGesture(Gesture.Shake, body);
@@ -54,5 +55,26 @@ namespace input {
     //% weight=0 help=input/calibrate-compass
     export function calibrate() {
         input.calibrateCompass();
+    }
+
+
+    /**
+     * Gets the number of milliseconds elapsed since power on.
+     */
+    //% help=input/running-time weight=50 blockGap=8
+    //% blockId=device_get_running_time block="running time (ms)"
+    //% advanced=true
+    export function runningTime() {
+        return control.millis();
+    }
+
+    /**
+     * Gets the number of microseconds elapsed since power on.
+     */
+    //% help=input/running-time-micros weight=49
+    //% blockId=device_get_running_time_micros block="running time (micros)"
+    //% advanced=true
+    export function runningTimeMicros() {
+        return control.micros();
     }
 }

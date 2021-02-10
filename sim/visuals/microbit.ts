@@ -290,6 +290,7 @@ path.sim-board {
         private leds: SVGElement[];
         private systemLed: SVGCircleElement;
         private antenna: SVGPolylineElement;
+        private rssi: SVGTextElement;
         private lightLevelButton: SVGCircleElement;
         private lightLevelGradient: SVGLinearGradientElement;
         private lightLevelText: SVGTextElement;
@@ -411,8 +412,9 @@ path.sim-board {
             this.updateTemperature();
             this.updateButtonAB();
             this.updateGestures();
+            this.updateRSSI();
 
-            if (!runtime || runtime.dead) U.addClass(this.element, "grayscale");
+            if (!this.props.runtime || this.props.runtime.dead) U.addClass(this.element, "grayscale");
             else U.removeClass(this.element, "grayscale");
         }
 
@@ -506,6 +508,8 @@ path.sim-board {
                     fill: `url(#${gid})`
                 });
                 this.thermometerText = svg.child(this.g, "text", { class: 'sim-text', x: 58, y: 130 }) as SVGTextElement;
+                if (this.props.runtime)
+                    this.props.runtime.environmentGlobals[pxsim.localization.lf("temperature")] = state.thermometerState.temperature;
                 this.updateTheme();
 
                 let pt = this.element.createSVGPoint();
@@ -582,6 +586,8 @@ path.sim-board {
             if (txt != this.headText.textContent) {
                 svg.rotateElement(this.head, xc, yc, state.compassState.heading + 180);
                 this.headText.textContent = txt;
+                if (this.props.runtime)
+                    this.props.runtime.environmentGlobals[pxsim.localization.lf("heading")] = state.compassState.heading;
             }
         }
 
@@ -603,12 +609,61 @@ path.sim-board {
                 let dax = 18;
                 let ayt = 10;
                 let ayb = 40;
+                const wh = dax * 5;
+                const antenaBackground = svg.child(this.g, "rect", { x: ax, y: ayt, width: wh, height: ayb - ayt, fill: "transparent" });
                 this.antenna = <SVGPolylineElement>svg.child(this.g, "polyline", { class: "sim-antenna", points: `${ax},${ayb} ${ax},${ayt} ${ax += dax},${ayt} ${ax},${ayb} ${ax += dax},${ayb} ${ax},${ayt} ${ax += dax},${ayt} ${ax},${ayb} ${ax += dax},${ayb} ${ax},${ayt} ${ax += dax},${ayt}` })
+
+                const pt = this.element.createSVGPoint();
+                const evh = (ev: MouseEvent) => {
+                    const state = this.board;
+                    if (!state) return;
+                    const pos = svg.cursorPoint(pt, this.element, ev);
+                    const rs = Math.max(-128, Math.min(-42, (-138 + (pos.x - ax + wh) / wh * 100) | 0));
+                    this.board.radioState.datagram.rssi = rs;
+                    this.updateRSSI();
+                };
+                svg.buttonEvents(antenaBackground, evh, evh, evh, (ev) => { })
+                svg.buttonEvents(this.antenna, evh, evh, evh, (ev) => { })
+
+                accessibility.makeFocusable(this.antenna);
+                accessibility.setAria(this.antenna, "slider", "RSSI");
+                this.antenna.setAttribute("aria-valuemin", "-128");
+                this.antenna.setAttribute("aria-valuemax", "-42");
+                this.antenna.setAttribute("aria-orientation", "horizontal");
+                this.antenna.setAttribute("aria-valuenow", "");
+                accessibility.setLiveContent("");
             }
             let now = Date.now();
             if (now - this.lastAntennaFlash > 200) {
                 this.lastAntennaFlash = now;
                 svg.animate(this.antenna, 'sim-flash-stroke')
+            }
+            this.updateRSSI();
+        }
+
+        private updateRSSI() {
+            let state = this.board;
+            if (!state) return;
+            const v = state.radioState.datagram.rssi;
+            if (v === undefined) return;
+
+            if (!this.rssi) {
+                let ax = 380;
+                let dax = 18;
+                let ayt = 10;
+                let ayb = 40;
+                const wh = dax * 5;
+                for (let i = 0; i < 4; ++i)
+                    svg.child(this.g, "rect", { x: ax - 90 + i * 6, y: ayt + 28 - i * 4, width: 4, height: 2 + i * 4, fill: "#fff" })
+                this.rssi = svg.child(this.g, "text", { x: ax - 64, y: ayb, class: "sim-text" }) as SVGTextElement;
+                this.rssi.textContent = "";
+            }
+
+            const vt = v.toString();
+            if (vt !== this.rssi.textContent) {
+                this.rssi.textContent = v.toString();
+                this.antenna.setAttribute("aria-valuenow", this.rssi.textContent);
+                accessibility.setLiveContent(this.rssi.textContent);
             }
         }
 
@@ -667,6 +722,8 @@ path.sim-board {
                         }
                     });
                 this.lightLevelText = svg.child(this.g, "text", { x: 85, y: cy + r - 5, text: '', class: 'sim-text' }) as SVGTextElement;
+                if (this.props.runtime)
+                    this.props.runtime.environmentGlobals[pxsim.localization.lf("lightLevel")] = state.lightSensorState.lightLevel;
                 this.updateTheme();
 
                 accessibility.makeFocusable(this.lightLevelButton);
@@ -706,6 +763,8 @@ path.sim-board {
             const z = acc.getZ();
             const af = 8 / 1023;
             const s = 1 - Math.min(0.1, Math.pow(Math.max(Math.abs(x), Math.abs(y)) / 1023, 2) / 35);
+
+            acc.updateEnvironmentGlobals();
 
             // fix top parent and apply style to it
             const el = this.findParentElement();
@@ -895,7 +954,8 @@ path.sim-board {
                     case "radiopacket": this.flashAntenna(); break;
                     case "eventbus":
                         if ((<pxsim.SimulatorEventBusMessage>msg).id == DAL.MES_BROADCAST_GENERAL_ID)
-                            this.flashAntenna(); break;
+                            this.flashAntenna();
+                        break;
                 }
             }
             let tiltDecayer = 0;

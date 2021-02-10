@@ -17,9 +17,8 @@ export class FieldGestures extends pxtblockly.FieldImages implements Blockly.Fie
         this.width_ = parseInt(options.width) || 350;
         this.addLabel_ = true;
 
-        this.setText = Blockly.FieldDropdown.prototype.setText;
-        this.updateWidth = (Blockly.Field as any).prototype.updateWidth;
-        this.updateTextNode_ = Blockly.Field.prototype.updateTextNode_;
+        this.renderSelectedImage_ = Blockly.FieldDropdown.prototype.renderSelectedText_;
+        this.updateSize_ = (Blockly.Field as any).prototype.updateSize_;
     }
 
     trimOptions_() {

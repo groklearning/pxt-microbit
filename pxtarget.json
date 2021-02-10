@@ -11,17 +11,15 @@
         "libs/devices",
         "libs/bluetooth",
         "libs/servo",
-        "libs/radio-broadcast"
+        "libs/radio-broadcast",
+        "libs/microphone"
     ],
     "cloud": {
         "workspace": false,
         "packages": true,
-        "sharing": false,
-        "thumbnails": false,
-        "publishing": false,
-        "importing": false,
-        "preferredPackages": [],
-        "githubPackages": false
+        "cloudProviders": {
+            "github": {}
+        }
     },
     "compile": {
         "isNative": false,
@@ -38,6 +36,8 @@
         "utf8": false,
         "gc": true,
         "imageRefTag": 9,
+        "shimRenames": {
+        },
         "patches": {
             "0.0.0 - 1.0.0": [
                 {
@@ -107,6 +107,45 @@
         "webUSB": true,
         "useNewFunctions": true
     },
+    "compileService": {
+        "yottaTarget": "bbc-microbit-classic-gcc",
+        "yottaCorePackage": "microbit",
+        "githubCorePackage": "lancaster-university/microbit",
+        "gittag": "v2.2.0-rc5",
+        "serviceId": "microbit",
+        "dockerImage": "pext/yotta:latest"
+    },
+    "multiVariants": [
+        "mbdal",
+        "mbcodal"
+    ],
+    "variants": {
+        "mbdal": {
+            "compile": {},
+            "compileService": {}
+        },
+        "mbcodal": {
+            "compile": {
+                "flashUsableEnd": null,
+                "flashEnd": null
+            },
+            "compileService": {
+                "buildEngine": "codal",
+                "codalTarget": {
+                    "name": "codal-microbit",
+                    "url": "https://github.com/microbit-foundation/codal-microbit",
+                    "branch": "v0.1.1",
+                    "type": "git"
+                },
+                "codalBinary": "MICROBIT",
+                "githubCorePackage": "microbit-foundation/codal",
+                "gittag": "pxt-wip-build-v0.0.1",
+                "serviceId": "mbcodal",
+                "dockerImage": "pext/yotta:latest",
+                "yottaConfigCompatibility": true
+            }
+        }
+    },
     "runtime": {
         "mathBlocks": true,
         "loopsBlocks": true,
@@ -115,6 +154,8 @@
         "textBlocks": true,
         "listsBlocks": true,
         "functionBlocks": true,
+        "breakBlock": true,
+        "continueBlock": true,
         "functionsOptions": {
             "useNewFunctions": true,
             "extraFunctionEditorTypes": [
@@ -123,6 +164,12 @@
                     "label": "LedSprite",
                     "icon": "send",
                     "defaultName": "sprite"
+                },
+                {
+                    "typeName": "Image",
+                    "label": "Image",
+                    "icon": "image outline",
+                    "defaultName": "image"
                 }
             ]
         },
@@ -236,14 +283,6 @@
             ]
         }
     },
-    "compileService": {
-        "yottaTarget": "bbc-microbit-classic-gcc",
-        "yottaCorePackage": "microbit",
-        "githubCorePackage": "lancaster-university/microbit",
-        "gittag": "pxtgc-0",
-        "serviceId": "microbit",
-        "dockerImage": "pext/yotta:latest"
-    },
     "serial": {
         "nameFilter": "^(mbed Serial Port|DAPLink CMSIS-DAP)",
         "log": true,
@@ -266,7 +305,7 @@
     "appTheme": {
         "allowParentController": true,
         "accentColor": "#5C005C",
-        "logoUrl": "https://microbit.org/code/",
+        "logoUrl": "https://microbit.org/",
         "logo": "./static/logo.portrait.white.svg",
         "docsLogo": "./static/logo.square.white.svg",
         "portraitLogo": "./static/logo.square.white.svg",
@@ -285,6 +324,7 @@
         "termsOfUseUrl": "https://groklearning.com/policies/terms/",
         "githubUrl": "https://github.com/groklearning/pxt-microbit-grok",
         "boardName": "micro:bit",
+        "boardNickname": "micro:bit",
         "driveDisplayName": "MICROBIT",
         "appStoreID": "1092687276",
         "mobileSafariDownloadProtocol": "microbithex://?data",
@@ -292,18 +332,18 @@
         "extendEditor": true,
         "extendFieldEditors": true,
         "enableTrace": true,
-        "ignoreDocsErrors": true,
+        "ignoreDocsErrors": false,
+        "errorList": true,
         "experiments": [
+            "autoWebUSBDownload",
             "allowPackageExtensions",
             "instructions",
-            "debugger",
+            "accessibleBlocks",
             "debugExtensionCode",
             "bluetoothUartConsole",
             "bluetoothPartialFlashing",
             "simScreenshot",
-            "simGif",
-            "qrCode",
-            "githubBlocksDiff"
+            "simGif"
         ],
         "bluetoothUartFilters": [
             {
@@ -318,14 +358,6 @@
             {
                 "name": "Reference",
                 "path": "/reference"
-            },
-            {
-                "name": "Blocks",
-                "path": "/blocks"
-            },
-            {
-                "name": "JavaScript",
-                "path": "/javascript"
             },
             {
                 "name": "Hardware",
@@ -400,10 +432,17 @@
                 "path": "/static/mb/device/usb-windows-sendto.jpg"
             }
         ],
+        "hideHomeDetailsVideo": true,
         "invertedMenu": true,
         "coloredToolbox": true,
         "monacoToolbox": true,
         "hasAudio": true,
+        "socialOptions": {
+            "orgTwitterHandle": "MSMakeCode",
+            "hashtags": "MakeCode",
+            "discourse": "https://forum.makecode.com/",
+            "discourseCategory": "micro:bit"
+        },
         "blocklyOptions": {
             "grid": {
                 "spacing": 45,
@@ -422,6 +461,7 @@
             "functions": "#3455DB",
             "arrays": "#E65722"
         },
+        "blocksCollapsing": true,
         "highContrast": true,
         "greenScreen": true,
         "print": true,
@@ -442,7 +482,9 @@
             "ja",
             "ko",
             "nl",
-            "no",
+            "nb",
+            "nn-NO",
+            "pl",
             "pt-BR",
             "pt-PT",
             "ru",
@@ -467,10 +509,18 @@
         "python": true,
         "showProjectSettings": true,
         "scriptManager": true,
+        "debugger": true,
         "simGifTransparent": "rgba(0,0,0,0)",
         "simGifMaxFrames": 44,
         "simScreenshotMaxUriLength": 300000,
-        "importExtensionFiles": true
+        "qrCode": true,
+        "importExtensionFiles": true,
+        "nameProjectFirst": true,
+        "githubEditor": true,
+        "chooseLanguageRestrictionOnNewProject": true,
+        "openProjectNewTab": true,
+        "python": true,
+        "appFlashingTroubleshoot": "/device/windows-app/troubleshoot"
     },
     "queryVariants": {
         "hidemenu": {
@@ -478,5 +528,6 @@
                 "hideMenuBar": true
             }
         }
-    }
+    },
+    "uploadDocs": true
 }

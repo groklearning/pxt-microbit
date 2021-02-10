@@ -9,6 +9,11 @@
         "largeImageUrl": "/static/mb/projects/flashing-heart/sim.gif"
     },
     {
+        "name": "Live Coding",
+        "url": "/live-coding",
+        "imageUrl": "/static/live-coding/live.png"
+    },
+    {
         "name": "Games",
         "url": "/projects/games",
         "imageUrl": "/static/mb/projects/a4-motion.png"
@@ -41,7 +46,7 @@
     {
         "name": "Tools",
         "url": "/projects/tools",
-        "imageUrl": "/static/mb/projects/plot-acceleration.png"
+        "imageUrl": "/static/mb/projects/stopwatch.png"
     },
     {
         "name": "Turtle",
@@ -64,9 +69,19 @@
         "imageUrl": "/static/mb/behindhardware/leds.jpg"
     },
     {
+        "name": "Science Experiments",
+        "url": "/science-experiments",
+        "imageUrl": "/static/mb/science-experiments/data-collection.jpg"
+    },
+    {
         "name": "Coding Cards",
         "url": "/coding-cards",
         "imageUrl": "/static/coding-cards/balance-card.jpg"
+    },
+    {
+        "name": "Beta Deep Dive",
+        "url": "/beta-deep-dive",
+        "imageUrl": "/static/beta-deep-dive/RpK4Cg42eNk.jpg"
     }
 ]
 ```
@@ -74,6 +89,7 @@
 ## See Also
 
 [Tutorials](/tutorials),
+[Live Coding](/live-coding),
 [Games](/projects/games),
 [Radio Games](/projects/radio-games),
 [Fashion](/projects/fashion),
@@ -85,5 +101,7 @@
 [Blocks To JavaScript](/courses/blocks-to-javascript),
 [Courses](/courses),
 [Behind the MakeCode Hardware](/behind-the-makecode-hardware),
-[Coding Cards](/coding-cards)
+[Science Experiments](/science-experiments),
+[Coding Cards](/coding-cards),
+[Beta Deep Dive](/beta-deep-dive)
 
