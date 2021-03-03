@@ -197,7 +197,6 @@ namespace basic {
     //% blockId=basic_show_arrow
     //% block="show arrow %i=device_arrow"
     //% parts="ledmatrix"
-    //% advanced=true
     //% help=basic/show-arrow
     export function showArrow(direction: number, interval = 600) {
         let res = images.arrowImage(direction)
@@ -210,7 +209,7 @@ namespace images {
 
     //% weight=50 blockGap=8
     //% help=images/arrow-image
-    //% blockId=builtin_arrow_image block="arrow image %i=device_arrow"
+    //% blockId=builtin_arrow_image block="arrow image %i"
     export function arrowImage(i: ArrowNames): Image {
         switch (i) {
             // compass directions

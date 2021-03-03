@@ -37,9 +37,11 @@ declare interface Image {
     /**
      * Shows an frame from the image at offset ``x offset``.
      * @param xOffset column index to start displaying the image
+     * @param interval time in milliseconds to pause after drawing
      */
     //% help=images/show-image weight=80 blockNamespace=images
-    //% blockId=device_show_image_offset block="show image %sprite(myImage)|at offset %offset"
+    //% blockId=device_show_image_offset block="show image %sprite(myImage)|at offset %offset ||and interval (ms) %interval"
+    //%
     //% blockGap=8 parts="ledmatrix" async interval.defl=400 shim=ImageMethods::showImage
     showImage(xOffset: int32, interval?: int32): void;
 
@@ -162,8 +164,7 @@ declare namespace basic {
      */
     //% help=basic/clear-screen weight=79
     //% blockId=device_clear_display block="clear screen"
-    //% parts="ledmatrix"
-    //% advanced=true shim=basic::clearScreen
+    //% parts="ledmatrix" shim=basic::clearScreen
     function clearScreen(): void;
 
     /**
@@ -329,23 +330,7 @@ declare namespace input {
     //% blockId=device_get_magnetic_force block="magnetic force (µT)|%NAME" blockGap=8
     //% parts="compass"
     //% advanced=true shim=input::magneticForce
-    function magneticForce(dimension: Dimension): int32;
-
-    /**
-     * Gets the number of milliseconds elapsed since power on.
-     */
-    //% help=input/running-time weight=50 blockGap=8
-    //% blockId=device_get_running_time block="running time (ms)"
-    //% advanced=true shim=input::runningTime
-    function runningTime(): int32;
-
-    /**
-     * Gets the number of microseconds elapsed since power on.
-     */
-    //% help=input/running-time-micros weight=49
-    //% blockId=device_get_running_time_micros block="running time (micros)"
-    //% advanced=true shim=input::runningTimeMicros
-    function runningTimeMicros(): int32;
+    function magneticForce(dimension: Dimension): number;
 
     /**
      * Obsolete, compass calibration is automatic.
@@ -374,11 +359,31 @@ declare namespace input {
 declare namespace control {
 
     /**
+     * Gets the number of milliseconds elapsed since power on.
+     */
+    //% help=control/millis weight=50
+    //% blockId=control_running_time block="millis (ms)" shim=control::millis
+    function millis(): int32;
+
+    /**
+     * Gets current time in microseconds. Overflows every ~18 minutes.
+     */
+    //% shim=control::micros
+    function micros(): int32;
+
+    /**
      * Schedules code that run in the background.
      */
     //% help=control/in-background blockAllowMultiple=1 afterOnStart=true
     //% blockId="control_in_background" block="run in background" blockGap=8 shim=control::inBackground
     function inBackground(a: () => void): void;
+
+    /**
+     * Blocks the calling thread until the specified event is raised.
+     */
+    //% help=control/wait-for-event async
+    //% blockId=control_wait_for_event block="wait for event|from %src|with value %value" shim=control::waitForEvent
+    function waitForEvent(src: int32, value: int32): void;
 
     /**
      * Resets the BBC micro:bit.
@@ -434,6 +439,7 @@ declare namespace control {
      * Make a friendly name for the device based on its serial number
      */
     //% blockId="control_device_name" block="device name" weight=10 blockGap=8
+    //% help=control/device-name
     //% advanced=true shim=control::deviceName
     function deviceName(): string;
 
@@ -441,8 +447,16 @@ declare namespace control {
      * Derive a unique, consistent serial number of this device from internal data.
      */
     //% blockId="control_device_serial_number" block="device serial number" weight=9
+    //% help=control/device-serial-number
     //% advanced=true shim=control::deviceSerialNumber
     function deviceSerialNumber(): int32;
+
+    /**
+     * Derive a unique, consistent 64-bit serial number of this device from internal data.
+     */
+    //% help=control/device-long-serial-number
+    //% advanced=true shim=control::deviceLongSerialNumber
+    function deviceLongSerialNumber(): Buffer;
 
     /**
      * Informs simulator/runtime of a MIDI message
@@ -456,6 +470,20 @@ declare namespace control {
      */
     //% shim=control::__log
     function __log(text: string): void;
+
+    /**
+     * Allocates the next user notification event
+     */
+    //% help=control/allocate-notify-event shim=control::allocateNotifyEvent
+    function allocateNotifyEvent(): int32;
+
+    /** Write a message to DMESG debugging buffer. */
+    //% shim=control::dmesg
+    function dmesg(s: string): void;
+
+    /** Write a message and value (pointer) to DMESG debugging buffer. */
+    //% shim=control::dmesgPtr
+    function dmesgPtr(str: string, ptr: Object): void;
 }
 
 
@@ -502,16 +530,17 @@ declare namespace led {
     function unplot(x: int32, y: int32): void;
 
     /**
-     * Get the on/off state of the specified LED using x, y coordinates. (0,0) is upper left.
+     * Get the brightness state of the specified LED using x, y coordinates. (0,0) is upper left.
      * @param x the horizontal coordinate of the LED
      * @param y the vertical coordinate of the LED
      */
-    //% help=led/point weight=76
-    //% blockId=device_point block="point|x %x|y %y"
+    //% help=led/point-brightness weight=76
+    //% blockId=device_point_brightness block="point|x %x|y %y brightness"
     //% parts="ledmatrix"
     //% x.min=0 x.max=4 y.min=0 y.max=4
-    //% x.fieldOptions.precision=1 y.fieldOptions.precision=1 shim=led::point
-    function point(x: int32, y: int32): boolean;
+    //% x.fieldOptions.precision=1 y.fieldOptions.precision=1
+    //% advanced=true shim=led::pointBrightness
+    function pointBrightness(x: int32, y: int32): int32;
 
     /**
      * Get the screen brightness from 0 (off) to 255 (full bright).
@@ -570,6 +599,55 @@ declare namespace led {
     //% help=led/screenshot
     //% parts="ledmatrix" shim=led::screenshot
     function screenshot(): Image;
+}
+declare namespace music {
+
+    /**
+     * Set the default output volume of the sound synthesizer.
+     * @param volume the volume 0...255
+     */
+    //% blockId=synth_set_volume block="set volume %volume"
+    //% volume.min=0 volume.max=255
+    //%
+    //% help=music/set-volume
+    //% weight=70
+    //% group="Volume"
+    //% blockGap=8 volume.defl=127 shim=music::setVolume
+    function setVolume(volume?: int32): void;
+
+    /**
+     * Returns the current output volume of the sound synthesizer.
+     */
+    //% blockId=synth_get_volume block="volume"
+    //% help=music/volume
+    //% weight=69
+    //% group="Volume"
+    //% blockGap=8 shim=music::volume
+    function volume(): int32;
+
+    /**
+     * Turn the built-in speaker on or off.
+     * Disabling the speaker resets the sound pin to the default of P0.
+     * @param enabled whether the built-in speaker is enabled in addition to the sound pin
+     */
+    //% blockId=music_set_built_in_speaker_enable block="set built-in speaker $enabled"
+    //% blockGap=8
+    //% group="micro:bit (V2)"
+    //% parts=builtinspeaker
+    //% help=music/set-built-in-speaker-enabled
+    //% enabled.shadow=toggleOnOff shim=music::setBuiltInSpeakerEnabled
+    function setBuiltInSpeakerEnabled(enabled: boolean): void;
+
+    /**
+     * Defines an optional sample level to generate during periods of silence.
+     **/
+    //% group="micro:bit (V2)"
+    //% help=music/set-silence-level
+    //% level.min=0
+    //% level.max=1024
+    //%
+    //% weight=1 level.defl=0 shim=music::setSilenceLevel
+    function setSilenceLevel(level?: int32): void;
 }
 declare namespace pins {
 
@@ -675,6 +753,12 @@ declare namespace pins {
     function servoWritePin(name: AnalogPin, value: int32): void;
 
     /**
+     * Specifies that a continuous servo is connected.
+     */
+    //% shim=pins::servoSetContinuous
+    function servoSetContinuous(name: AnalogPin, value: boolean): void;
+
+    /**
      * Configure the IO pin as an analog/pwm output and set a pulse width. The period is 20 ms period and the pulse width is set based on the value given in **microseconds** or `1/1000` milliseconds.
      * @param name pin name
      * @param micros pulse duration in micro seconds, eg:1500
@@ -694,6 +778,24 @@ declare namespace pins {
     //% name.fieldEditor="gridpicker" name.fieldOptions.columns=4
     //% name.fieldOptions.tooltips="false" name.fieldOptions.width="250" shim=pins::analogSetPitchPin
     function analogSetPitchPin(name: AnalogPin): void;
+
+    /**
+     * Sets the volume on the pitch pin
+     * @param volume the intensity of the sound from 0..255
+     */
+    //% blockId=device_analog_set_pitch_volume block="analog set pitch volume $volume"
+    //% help=pins/analog-set-pitch-volume weight=3 advanced=true
+    //% volume.min=0 volume.max=255
+    //% deprecated shim=pins::analogSetPitchVolume
+    function analogSetPitchVolume(volume: int32): void;
+
+    /**
+     * Gets the volume the pitch pin from 0..255
+     */
+    //% blockId=device_analog_pitch_volume block="analog pitch volume"
+    //% help=pins/analog-pitch-volume weight=3 advanced=true
+    //% deprecated shim=pins::analogPitchVolume
+    function analogPitchVolume(): int32;
 
     /**
      * Emit a plse-width modulation (PWM) signal to the current pitch pin. Use `analog set pitch pin` to define the pitch pin.
@@ -755,6 +857,14 @@ declare namespace pins {
     function spiWrite(value: int32): int32;
 
     /**
+     * Write to and read from the SPI slave at the same time
+     * @param command Data to be sent to the SPI slave (can be null)
+     * @param response Data received from the SPI slave (can be null)
+     */
+    //% help=pins/spi-transfer argsNullable shim=pins::spiTransfer
+    function spiTransfer(command: Buffer, response: Buffer): void;
+
+    /**
      * Set the SPI frequency
      * @param frequency the clock frequency, eg: 1000000
      */
@@ -784,6 +894,23 @@ declare namespace pins {
     //% sck.fieldEditor="gridpicker" sck.fieldOptions.columns=4
     //% sck.fieldOptions.tooltips="false" sck.fieldOptions.width="250" shim=pins::spiPins
     function spiPins(mosi: DigitalPin, miso: DigitalPin, sck: DigitalPin): void;
+
+    /**
+     * Mounts a push button on the given pin
+     */
+    //% help=pins/push-button advanced=true shim=pins::pushButton
+    function pushButton(pin: DigitalPin): void;
+
+    /**
+     * Set the pin used when producing sounds and melodies. Default is P0.
+     * @param name pin to modulate pitch from
+     */
+    //% blockId=pin_set_audio_pin block="set audio pin $name"
+    //% help=pins/set-audio-pin weight=3
+    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=4
+    //% name.fieldOptions.tooltips="false" name.fieldOptions.width="250"
+    //% weight=1 shim=pins::setAudioPin
+    function setAudioPin(name: AnalogPin): void;
 }
 
 
@@ -834,8 +961,9 @@ declare namespace serial {
     function writeBuffer(buffer: Buffer): void;
 
     /**
-     * Read multiple characters from the receive buffer. Pause until enough characters are present.
-     * @param length default buffer length, eg: 64
+     * Read multiple characters from the receive buffer. 
+     * If length is positive, pauses until enough characters are present.
+     * @param length default buffer length
      */
     //% blockId=serial_readbuffer block="serial|read buffer %length"
     //% help=serial/read-buffer advanced=true weight=5 shim=serial::readBuffer
@@ -857,6 +985,16 @@ declare namespace serial {
     //% rx.fieldOptions.tooltips="false"
     //% blockGap=8 shim=serial::redirect
     function redirect(tx: SerialPin, rx: SerialPin, rate: BaudRate): void;
+
+    /**
+    Set the baud rate of the serial port
+     */
+    //% weight=10
+    //% blockId=serial_setbaudrate block="serial|set baud rate %rate"
+    //% blockGap=8 inlineInputMode=inline
+    //% help=serial/set-baud-rate
+    //% group="Configuration" advanced=true shim=serial::setBaudRate
+    function setBaudRate(rate: BaudRate): void;
 
     /**
      * Direct the serial input and output to use the USB connection.
@@ -893,6 +1031,12 @@ declare interface Buffer {
      */
     //% shim=BufferMethods::getUint8
     getUint8(off: int32): int32;
+
+    /**
+     * Returns false when the buffer can be written to.
+     */
+    //% shim=BufferMethods::isReadOnly
+    isReadOnly(): boolean;
 
     /**
      * Writes an unsigned byte at a particular location
@@ -965,6 +1109,12 @@ declare interface Buffer {
      */
     //% shim=BufferMethods::write
     write(dstOffset: int32, src: Buffer): void;
+
+    /**
+     * Compute k-bit FNV-1 non-cryptographic hash of the buffer.
+     */
+    //% shim=BufferMethods::hash
+    hash(bits: int32): uint32;
 }
 declare namespace control {
 
@@ -972,15 +1122,90 @@ declare namespace control {
      * Create a new zero-initialized buffer.
      * @param size number of bytes in the buffer
      */
-    //% shim=control::createBuffer
+    //% deprecated=1 shim=control::createBuffer
     function createBuffer(size: int32): Buffer;
 
     /**
      * Create a new buffer with UTF8-encoded string
      * @param str the string to put in the buffer
      */
-    //% shim=control::createBufferFromUTF8
+    //% deprecated=1 shim=control::createBufferFromUTF8
     function createBufferFromUTF8(str: string): Buffer;
+}
+declare namespace light {
+
+    /**
+     * Sends a color buffer to a light strip
+     **/
+    //% advanced=true shim=light::sendWS2812Buffer
+    function sendWS2812Buffer(buf: Buffer, pin: int32): void;
+
+    /**
+     * Sends a color buffer to a light strip
+     **/
+    //% advanced=true shim=light::sendWS2812BufferWithBrightness
+    function sendWS2812BufferWithBrightness(buf: Buffer, pin: int32, brightness: int32): void;
+
+    /**
+     * Sets the light mode of a pin
+     **/
+    //% advanced=true
+    //% shim=light::setMode
+    function setMode(pin: int32, mode: int32): void;
+}
+declare namespace input {
+
+    /**
+     * Do something when the logo is touched and released again.
+     * @param body the code to run when the logo is pressed
+     */
+    //% weight=83 blockGap=32
+    //% blockId=input_logo_event block="on logo $action"
+    //% group="micro:bit (V2)"
+    //% parts="logotouch"
+    //% help="input/on-logo-event" shim=input::onLogoEvent
+    function onLogoEvent(action: TouchButtonEvent, body: () => void): void;
+
+    /**
+     * Get the logo state (pressed or not).
+     */
+    //% weight=58
+    //% blockId="input_logo_is_pressed" block="logo is pressed"
+    //% blockGap=8
+    //% group="micro:bit (V2)"
+    //% parts="logotouch"
+    //% help="input/logo-is-pressed" shim=input::logoIsPressed
+    function logoIsPressed(): boolean;
+}
+declare namespace pins {
+
+    /**
+     * Configure the touch detection for the pins and logo.
+     * P0, P1, P2 use resistive touch by default.
+     * The logo uses capacitative touch by default.
+     * @param name target to change the touch mode for
+     * @param mode the touch mode to use
+     */
+    //% weight=60
+    //% blockId=device_touch_set_type block="set %name to touch mode %mode"
+    //% advanced=true
+    //% group="micro:bit (V2)"
+    //% help=pins/touch-set-mode shim=pins::touchSetMode
+    function touchSetMode(name: TouchTarget, mode: TouchTargetMode): void;
+}
+declare namespace music {
+
+    /**
+     * Internal use only
+     **/
+    //% async shim=music::__playSoundExpression
+    function __playSoundExpression(nodes: string, waitTillDone: boolean): void;
+
+    /**
+     * Internal use only
+     */
+    //% shim=music::__stopSoundExpressions
+    function __stopSoundExpressions(): void;
 }
 
 // Auto-generated. Do not edit. Really.

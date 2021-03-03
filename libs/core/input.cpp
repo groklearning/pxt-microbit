@@ -74,13 +74,13 @@ enum class Gesture {
     //% jres=gestures.tiltbackwards
     LogoDown = MICROBIT_ACCELEROMETER_EVT_TILT_DOWN,
     /**
-     * Raised when the screen is pointing down and the board is horizontal
+     * Raised when the screen is pointing up and the board is horizontal
      */
     //% block="screen up"
     //% jres=gestures.frontsideup
     ScreenUp = MICROBIT_ACCELEROMETER_EVT_FACE_UP,
     /**
-     * Raised when the screen is pointing up and the board is horizontal
+     * Raised when the screen is pointing down and the board is horizontal
      */
     //% block="screen down"
     //% jres=gestures.backsideup
@@ -349,37 +349,17 @@ namespace input {
     //% blockId=device_get_magnetic_force block="magnetic force (µT)|%NAME" blockGap=8
     //% parts="compass"
     //% advanced=true
-    int magneticForce(Dimension dimension) {
-      if (!uBit.compass.isCalibrated())
-        uBit.compass.calibrate();
-
-      switch (dimension) {
-      case Dimension::X: return uBit.compass.getX() / 1000;
-      case Dimension::Y: return uBit.compass.getY() / 1000;
-      case Dimension::Z: return uBit.compass.getZ() / 1000;
-      case Dimension::Strength: return uBit.compass.getFieldStrength() / 1000;
-      }
-      return 0;
-    }
-
-    /**
-     * Gets the number of milliseconds elapsed since power on.
-     */
-    //% help=input/running-time weight=50 blockGap=8
-    //% blockId=device_get_running_time block="running time (ms)"
-    //% advanced=true
-    int runningTime() {
-        return system_timer_current_time();
-    }
-
-    /**
-     * Gets the number of microseconds elapsed since power on.
-     */
-    //% help=input/running-time-micros weight=49
-    //% blockId=device_get_running_time_micros block="running time (micros)"
-    //% advanced=true
-    int runningTimeMicros() {
-        return system_timer_current_time_us();
+    TNumber magneticForce(Dimension dimension) {
+        if (!uBit.compass.isCalibrated())
+            uBit.compass.calibrate();
+        double d = 0;        
+        switch (dimension) {
+            case Dimension::X: d = uBit.compass.getX(); break;
+            case Dimension::Y: d = uBit.compass.getY(); break;
+            case Dimension::Z: d = uBit.compass.getZ(); break;
+            case Dimension::Strength: d = uBit.compass.getFieldStrength() ; break;
+        }
+        return fromDouble(d / 1000.0);
     }
 
     /**

@@ -1,5 +1,12 @@
 #include "pxt.h"
 
+#if MICROBIT_CODAL
+#include "Pin.h"
+#define PinCompat codal::Pin
+#else
+#define PinCompat MicroBitPin
+#endif
+
 enum class DigitalPin {
     P0 = MICROBIT_ID_IO_P0,
     P1 = MICROBIT_ID_IO_P1,
@@ -112,6 +119,10 @@ MicroBitPin *getPin(int id) {
         case MICROBIT_ID_IO_P16: return &uBit.io.P16;
         case MICROBIT_ID_IO_P19: return &uBit.io.P19;
         case MICROBIT_ID_IO_P20: return &uBit.io.P20;
+#if MICROBIT_CODAL
+        case 1001: return &uBit.io.usbTx;
+        case 1002: return &uBit.io.usbRx;
+#endif
         default: return NULL;
     }
 }
@@ -243,6 +254,17 @@ namespace pins {
         MicroBitPin* pin = getPin((int)name);
         if (!pin) return 0;
 
+#if MICROBIT_CODAL
+        // set polarity
+        pin->setPolarity(PulseValue::High == value ? 1 : 0);
+        // record pulse
+        int period = pin->getPulseUs(maxDuration);
+        // timeout
+        if (DEVICE_CANCELLED == period)
+            return 0;
+        // success!
+        return period;
+#else
         int pulse = value == PulseValue::High ? 1 : 0;
         uint64_t tick =  system_timer_current_time_us();
         uint64_t maxd = (uint64_t)maxDuration;
@@ -258,6 +280,7 @@ namespace pins {
         }
         uint64_t end =  system_timer_current_time_us();
         return end - start;
+#endif
     }
 
     /**
@@ -276,6 +299,14 @@ namespace pins {
     }
 
     /**
+    * Specifies that a continuous servo is connected.
+    */
+    //%
+    void servoSetContinuous(AnalogPin name, bool value) {
+        // handled in simulator
+    }
+
+    /**
      * Configure the IO pin as an analog/pwm output and set a pulse width. The period is 20 ms period and the pulse width is set based on the value given in **microseconds** or `1/1000` milliseconds.
      * @param name pin name
      * @param micros pulse duration in micro seconds, eg:1500
@@ -289,7 +320,9 @@ namespace pins {
     }
 
 
-    MicroBitPin* pitchPin = NULL;
+    PinCompat* pitchPin = NULL;
+    uint8_t pitchVolume = 0xff;
+    bool analogTonePlaying = false;
 
     /**
      * Set the pin used when using analog pitch or music.
@@ -300,7 +333,45 @@ namespace pins {
     //% name.fieldEditor="gridpicker" name.fieldOptions.columns=4
     //% name.fieldOptions.tooltips="false" name.fieldOptions.width="250"
     void analogSetPitchPin(AnalogPin name) {
-      pitchPin = getPin((int)name);
+        pitchPin = getPin((int)name);
+    }
+
+    void pinAnalogSetPitch(PinCompat* pin, int frequency, int ms) {
+      if (frequency <= 0 || pitchVolume == 0) {
+        pin->setAnalogValue(0);
+      } else {
+        int v = 1 << (pitchVolume >> 5);
+        pin->setAnalogValue(v);
+        pin->setAnalogPeriodUs(1000000/frequency);
+      }
+    }
+
+    /**
+    * Sets the volume on the pitch pin
+    * @param volume the intensity of the sound from 0..255
+    */
+    //% blockId=device_analog_set_pitch_volume block="analog set pitch volume $volume"
+    //% help=pins/analog-set-pitch-volume weight=3 advanced=true
+    //% volume.min=0 volume.max=255
+    //% deprecated
+    void analogSetPitchVolume(int volume) {
+        pitchVolume = max(0, min(0xff, volume));
+
+        if (analogTonePlaying) {
+            int v = pitchVolume == 0 ? 0 : 1 << (pitchVolume >> 5);
+            if (NULL != pitchPin)
+                pitchPin->setAnalogValue(v);
+        }
+    }
+
+    /**
+    * Gets the volume the pitch pin from 0..255
+    */
+    //% blockId=device_analog_pitch_volume block="analog pitch volume"
+    //% help=pins/analog-pitch-volume weight=3 advanced=true
+    //% deprecated
+    int analogPitchVolume() {
+        return pitchVolume;
     }
 
     /**
@@ -311,21 +382,27 @@ namespace pins {
     //% blockId=device_analog_pitch block="analog pitch %frequency|for (ms) %ms"
     //% help=pins/analog-pitch weight=4 async advanced=true blockGap=8
     void analogPitch(int frequency, int ms) {
-      if (pitchPin == NULL)
-        analogSetPitchPin(AnalogPin::P0);
-      if (frequency <= 0) {
-        pitchPin->setAnalogValue(0);
-      } else {
-        pitchPin->setAnalogValue(512);
-        pitchPin->setAnalogPeriodUs(1000000/frequency);
-      }
-
-      if (ms > 0) {
-          fiber_sleep(ms);
-          pitchPin->setAnalogValue(0);
-          // TODO why do we use wait_ms() here? it's a busy wait I think
-          wait_ms(5);
-      }
+        // init pins if needed
+        if (NULL == pitchPin) {
+#if MICROBIT_CODAL
+            pitchPin = &uBit.audio.virtualOutputPin;
+#else
+            pitchPin = getPin((int)AnalogPin::P0);
+#endif            
+        }
+        // set pitch
+        analogTonePlaying = true;
+        if (NULL != pitchPin)
+            pinAnalogSetPitch(pitchPin, frequency, ms);
+        // clear pitch
+        if (ms > 0) {
+            fiber_sleep(ms);
+            if (NULL != pitchPin)
+                pitchPin->setAnalogValue(0);
+            analogTonePlaying = false;
+            // causes issues with v2 DMA.
+            // fiber_sleep(5);
+        }
     }
 
 
@@ -339,11 +416,19 @@ namespace pins {
     //% pin.fieldEditor="gridpicker" pin.fieldOptions.columns=4
     //% pin.fieldOptions.tooltips="false" pin.fieldOptions.width="250"
     void setPull(DigitalPin name, PinPullMode pull) {
+#if MICROBIT_CODAL
+        codal::PullMode m = pull == PinPullMode::PullDown
+            ? codal::PullMode::Down
+            : pull == PinPullMode::PullUp ? codal::PullMode::Up
+            : codal::PullMode::None;
+        PINOP(setPull(m));
+#else
         PinMode m = pull == PinPullMode::PullDown
             ? PinMode::PullDown
             : pull == PinPullMode::PullUp ? PinMode::PullUp
             : PinMode::PullNone;
         PINOP(setPull(m));
+#endif
     }
 
     /**
@@ -370,6 +455,12 @@ namespace pins {
         return mkBuffer(NULL, size);
     }
 
+#if MICROBIT_CODAL
+#define BUFFER_TYPE uint8_t*
+#else
+#define BUFFER_TYPE char*
+#endif
+
     /**
      * Read `size` bytes from a 7-bit I2C `address`.
      */
@@ -377,7 +468,7 @@ namespace pins {
     Buffer i2cReadBuffer(int address, int size, bool repeat = false)
     {
       Buffer buf = createBuffer(size);
-      uBit.i2c.read(address << 1, (char*)buf->data, size, repeat);
+      uBit.i2c.read(address << 1, (BUFFER_TYPE)buf->data, size, repeat);
       return buf;
     }
 
@@ -387,7 +478,7 @@ namespace pins {
     //%
     int i2cWriteBuffer(int address, Buffer buf, bool repeat = false)
     {
-      return uBit.i2c.write(address << 1, (char*)buf->data, buf->length, repeat);
+      return uBit.i2c.write(address << 1, (BUFFER_TYPE)buf->data, buf->length, repeat);
     }
 
     SPI* spi = NULL;
@@ -406,6 +497,30 @@ namespace pins {
     int spiWrite(int value) {
         auto p = allocSPI();
         return p->write(value);
+    }
+
+    /**
+    * Write to and read from the SPI slave at the same time
+    * @param command Data to be sent to the SPI slave (can be null)
+    * @param response Data received from the SPI slave (can be null)
+    */
+    //% help=pins/spi-transfer argsNullable
+    void spiTransfer(Buffer command, Buffer response) {
+        if (!command && !response)
+            target_panic(PANIC_INVALID_ARGUMENT);
+        if (command && response && command->length != response->length)
+            target_panic(PANIC_INVALID_ARGUMENT);
+        auto p = allocSPI();
+        unsigned len = command ? command->length : response->length;
+#if MICROBIT_CODAL
+        p->transfer(command ? command->data : NULL, command ? len : 0,
+                    response ? response->data : NULL, response ? len : 0);
+#else
+        for (unsigned i = 0; i < len; ++i) {
+            int v = p->write(command ? command->data[i] : 0);
+            if (response) response->data[i] = v;
+        }
+#endif
     }
 
     /**
@@ -428,8 +543,14 @@ namespace pins {
     //% blockId=spi_format block="spi format|bits %bits|mode %mode"
     void spiFormat(int bits, int mode) {
         auto p = allocSPI();
-        p->format(bits, mode);        
+        p->format(bits, mode);
     }
+
+#if MICROBIT_CODAL
+#define PIN_ARG(pin) *(getPin((int)(pin)))
+#else
+#define PIN_ARG(pin) (getPin((int)(pin)))->name
+#endif
 
     /**
     * Set the MOSI, MISO, SCK pins used by the SPI connection
@@ -448,7 +569,33 @@ namespace pins {
             delete spi;
             spi = NULL;
         }
+        spi = new SPI(PIN_ARG(mosi), PIN_ARG(miso), PIN_ARG(sck));
+    }
 
-        spi = new SPI(getPin((int)mosi)->name, getPin((int)miso)->name, getPin((int)sck)->name);
+    /**
+    * Mounts a push button on the given pin
+    */
+    //% help=pins/push-button advanced=true
+    void pushButton(DigitalPin pin) {
+        new MicroBitButton((PinName)getPin((int)(pin))->name, (int)pin, MICROBIT_BUTTON_ALL_EVENTS, PinMode::PullUp);
+    }
+
+    /**
+    * Set the pin used when producing sounds and melodies. Default is P0.
+    * @param name pin to modulate pitch from
+    */
+    //% blockId=pin_set_audio_pin block="set audio pin $name"
+    //% help=pins/set-audio-pin weight=3
+    //% name.fieldEditor="gridpicker" name.fieldOptions.columns=4
+    //% name.fieldOptions.tooltips="false" name.fieldOptions.width="250"
+    //% weight=1
+    void setAudioPin(AnalogPin name) {
+#if MICROBIT_CODAL
+        uBit.audio.setPin(*getPin((int)name));
+        uBit.audio.setPinEnabled(true);
+#else
+        // v1 behavior
+        pins::analogSetPitchPin(name);
+#endif
     }
 }

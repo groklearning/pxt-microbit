@@ -4,7 +4,7 @@
 
 Imagine that there's a virtual turtle, as small as an LED, that you can control with commands. In this tutorial, you will learn to use the turtle and draw a square.
 
-## Moving the turtle @fullscreen
+## Moving the turtle
 
 The turtle starts in the center of the screen heading upward. Place a ``||turtle:forward||`` block to make it move up.
 
@@ -12,7 +12,7 @@ The turtle starts in the center of the screen heading upward. Place a ``||turtle
 turtle.forward(1)
 ```
 
-## Turning and moving @fullscreen
+## Turning and moving
 
 Place a ``||turtle:turnRight||`` to turn the turtle and place another ``||turtle:forward||`` block to make it move again.
 
@@ -47,7 +47,7 @@ Did you notice the pattern of repeated blocks needed to draw a square? Try using
 
 ```blocks
 input.onButtonPressed(Button.A, function() {
-    for(let i = 0; i <=4; ++i) {
+    for(let index = 0; index <= 4; index++) {
         turtle.forward(1)
         turtle.turnRight()
     }
@@ -61,7 +61,7 @@ The turtle holds a **pen** that can turn on LEDs. If you add the ``||turtle:pen|
 ```blocks
 input.onButtonPressed(Button.A, function() {
     turtle.pen(TurtlePenMode.Down)
-    for(let i = 0; i <=4; ++i) {
+    for(let index = 0; index <= 4; index++) {
         turtle.forward(1)
         turtle.turnRight()
     }

@@ -15,11 +15,11 @@ basic.forever(function() {
     led.plot(eggX, eggY)
     basic.pause(300)
     let accX = input.acceleration(Dimension.X)
-    basketX = 2 + Math.min(2, Math.max(-2, accX / 200))
+    basketX = 2 + Math.min(2, Math.max(-2, Math.idiv(accX, 200)))
     led.plot(basketX, 4)
     if (eggY > 4) {
         eggY = -1
-        eggX = Math.randomRange(0, 4)
+        eggX = randint(0, 4)
     }
     basic.pause(300)
 })
@@ -46,15 +46,15 @@ basic.forever(function() {
     led.plot(eggX1, eggY1)
     basic.pause(300)
     let accX = input.acceleration(Dimension.X)
-    basketX1 = 2 + Math.min(2, Math.max(-2, accX / 200))
+    basketX1 = 2 + Math.min(2, Math.max(-2, Math.idiv(accX, 200)))
     led.plot(basketX1, 4)
     if (eggY1 > 4) {
         eggY1 = -1
-        eggX1 = Math.randomRange(0, 4)
+        eggX1 = randint(0, 4)
     }
     if (eggY1 == 4) {
         if (basketX1 == eggX1) {
-            game.addScore(1) 
+            game.addScore(1)
         } else {
             game.removeLife(1)
         }
@@ -85,11 +85,11 @@ basic.forever(function() {
     led.plot(eggX2, eggY2)
     basic.pause(300)
     let accX2 = input.acceleration(Dimension.X)
-    basketX2 = 2 + Math.min(2, Math.max(-2, accX2 / 200))
+    basketX2 = 2 + Math.min(2, Math.max(-2, Math.idiv(accX2, 200)))
     led.plot(basketX2, 4)
     if (eggY2 > 4) {
         eggY2 = -1
-        eggX2 = Math.randomRange(0, 4)
+        eggX2 = randint(0, 4)
     }
     if (eggY2 == 4) {
         if (basketX2 == eggX2) {
@@ -124,11 +124,11 @@ basic.forever(function() {
     led.plot(eggX3, eggY3)
     basic.pause(300)
     let accX3 = input.acceleration(Dimension.X)
-    basketX3 = 2 + Math.min(2, Math.max(-2, accX3 / 200))
+    basketX3 = 2 + Math.min(2, Math.max(-2, Math.idiv(accX3, 200)))
     led.plot(basketX3, 4)
     if (eggY3 > 4) {
         eggY3 = -1
-        eggX3 = Math.randomRange(0, 4)
+        eggX3 = randint(0, 4)
     }
     if (eggY3 == 4) {
         if (basketX3 == eggX3) {
@@ -140,7 +140,7 @@ basic.forever(function() {
             game.removeLife(1)
         }
     }
-    basic.pause(fallingPause1) 
+    basic.pause(fallingPause1)
 })
 ```
 

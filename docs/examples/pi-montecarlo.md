@@ -50,10 +50,8 @@ This method of filling coordinate points, counting them, and using the differenc
 ## Monte Carlo approximation of _pi_
 
 ```blocks
-let pir = 0
-let pid = 0
+let pi = 0
 let y = 0
-let pin = 0
 let x = 0
 let r2 = 0
 let r = 0
@@ -75,8 +73,8 @@ basic.forever(() => {
     inside = 0
     for (let i = 0; i < n; i++) {
         // generate a point within the square
-        x = Math.randomRange(0, r + 1)
-        y = Math.randomRange(0, r + 1)
+        x = randint(0, r + 1)
+        y = randint(0, r + 1)
         // test if the point is within the circle
         // sqrt(x**2 + y**2) < r ==> x**2 + y**2 < r**2
         if (x * x + y * y < r2) {
@@ -87,10 +85,7 @@ basic.forever(() => {
     // r * r * pi => inside / n ~= (r*r*pi) / (4*r*r) ~=
     // pi / 4 pi = inside / n * 4
     //
-    pin = inside * 4
-    // only integer arithmetic here...
-    pid = pin / n
-    pir = pin % n
+    pi = (inside * 4) / n
     // show results
     basic.showLeds(`
         # # # # #
@@ -99,6 +94,6 @@ basic.forever(() => {
         . # . # .
         . # . . #
         `)
-    basic.showString(" " + pid + "." + pir)
+    basic.showString(" " + pi)
 })
 ```
